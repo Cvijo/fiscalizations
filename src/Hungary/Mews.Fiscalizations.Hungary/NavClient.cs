@@ -36,7 +36,7 @@ namespace Mews.Fiscalizations.Hungary
             return Client.ProcessRequestAsync<Dto.TokenExchangeRequest, Dto.TokenExchangeResponse, ExchangeToken, ExchangeTokenErrorCode>(
                 endpoint: "tokenExchange",
                 request: request,
-                successFunc: response => ModelMapper.MapExchangeToken(response, TechnicalUser)
+                successFunc: (response) => ModelMapper.MapExchangeToken(response, TechnicalUser)
             );
         }
 
@@ -51,7 +51,7 @@ namespace Mews.Fiscalizations.Hungary
             return Client.ProcessRequestAsync<Dto.QueryTransactionStatusRequest, Dto.QueryTransactionStatusResponse, TransactionStatus, TransactionErrorCode>(
                 endpoint: "queryTransactionStatus",
                 request: request,
-                successFunc: response => ModelMapper.MapTransactionStatus(response)
+                successFunc: (response) => ModelMapper.MapTransactionStatus(response)
             );
         }
 
@@ -61,7 +61,7 @@ namespace Mews.Fiscalizations.Hungary
             return Client.ProcessRequestAsync<Dto.QueryTaxpayerRequest, Dto.QueryTaxpayerResponse, TaxPayerData, TaxPayerErrorCode>(
                 endpoint: "queryTaxpayer",
                 request: request,
-                successFunc: response => ModelMapper.MapTaxPayerData(response)
+                successFunc: (response) => ModelMapper.MapTaxPayerData(response)
             );
         }
 
@@ -92,7 +92,7 @@ namespace Mews.Fiscalizations.Hungary
             return Client.ProcessRequestAsync<Dto.ManageInvoiceRequest, Dto.ManageInvoiceResponse, string, ResultErrorCode>(
                 endpoint: "manageInvoice",
                 request: request,
-                successFunc: response => ModelMapper.MapManageInvoice(response)
+                successFunc: (response) => ModelMapper.MapManageInvoice(response)
             );
         }
     }

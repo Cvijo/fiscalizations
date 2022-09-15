@@ -11,6 +11,8 @@ namespace Mews.Fiscalizations.Hungary.Utils
     {
         private HttpClient HttpClient { get; }
         private NavEnvironment Environment { get; }
+        private string XmlRequestBody { get; set; }
+        private string XmlResponseBody { get; set; }
 
         internal Client(HttpClient httpClient, NavEnvironment environment)
         {
@@ -25,7 +27,10 @@ namespace Mews.Fiscalizations.Hungary.Utils
             where TCode : struct
         {
             var httpResponse = await SendRequestAsync(endpoint, request);
-            return await DeserializeAsync(httpResponse, successFunc);
+            var result = await DeserializeAsync(httpResponse, successFunc);
+            result.XmlRequestBody = XmlRequestBody;
+            result.XmlResponseBody = XmlResponseBody;
+            return result;
         }
 
         private Task<HttpResponseMessage> SendRequestAsync<TRequest>(string endpoint, TRequest request)
@@ -35,6 +40,7 @@ namespace Mews.Fiscalizations.Hungary.Utils
             var xml = XmlSerializer.Serialize(request, parameters);
             var content = new StringContent(xml.OuterXml, ServiceInfo.Encoding, "application/xml");
             var uri = new Uri(ServiceInfo.BaseUrls[Environment], $"{ServiceInfo.RelativeServiceUrl}{endpoint}");
+            XmlRequestBody = xml.OuterXml;
             return HttpClient.PostAsync(uri, content);
         }
 
@@ -44,6 +50,8 @@ namespace Mews.Fiscalizations.Hungary.Utils
             where TCode : struct
         {
             var content = await response.Content.ReadAsStringAsync();
+            XmlResponseBody = content;
+            
             if (response.IsSuccessStatusCode)
             {
                 return successFunc(XmlSerializer.Deserialize<TDto>(content));

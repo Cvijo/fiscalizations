@@ -5,10 +5,11 @@ namespace Mews.Fiscalizations.Hungary.Models
 {
     public sealed class TaxPayerData
     {
-        public TaxPayerData(string id, string name, Address address, string vatCode, IncorporationType incorporationType, DateTime? infoDate = null)
+        public TaxPayerData(string id, string name, string shortName, Address address, string vatCode, IncorporationType incorporationType, DateTime? infoDate = null)
         {
             Id = id;
             Name = name;
+            ShortName = shortName;
             Address = address;
             VatCode = vatCode;
             IncorporationType = incorporationType;
@@ -18,6 +19,8 @@ namespace Mews.Fiscalizations.Hungary.Models
         public string Id { get; }
 
         public string Name { get; }
+
+        public string ShortName { get; }
 
         public Address Address { get; }
 

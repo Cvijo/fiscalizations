@@ -36,6 +36,7 @@ namespace Mews.Fiscalizations.Hungary
                 return new ResponseResult<TaxPayerData, TaxPayerErrorCode>(successResult: new TaxPayerData(
                     id: taxNumberDetail.taxpayerId,
                     name: taxPayerData.taxpayerName,
+                    shortName: taxPayerData.taxpayerShortName,
                     address: MapAddress(addressItem),
                     vatCode: taxNumberDetail.vatCode,
                     infoDate: response.infoDate,
@@ -69,7 +70,7 @@ namespace Mews.Fiscalizations.Hungary
 
         internal static ResponseResult<string, ResultErrorCode> MapManageInvoice(Dto.ManageInvoiceResponse response)
         {
-            return new ResponseResult<string, ResultErrorCode>(successResult: response.transactionId);
+            return new ResponseResult<string, ResultErrorCode>( successResult: response.transactionId);
         }
 
         private static IncorporationType MapIncorporationType(Dto.IncorporationType incorporationType)

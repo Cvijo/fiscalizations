@@ -4,17 +4,20 @@ namespace Mews.Fiscalizations.Hungary.Models
 {
     public sealed class TaxSummaryItem
     {
-        public TaxSummaryItem(Amount amount, Amount amountHUF, decimal? taxRatePercentage = null)
+        public TaxSummaryItem(Amount amount, Amount amountHUF, TaxRate taxRate)
         {
             Amount = amount;
             AmountHUF = amountHUF;
-            TaxRatePercentage = taxRatePercentage.ToOption();
+            TaxRate = taxRate;
+            //TaxRatePercentage = taxRatePercentage.ToOption();
+            
         }
 
         public Amount Amount { get; }
 
         public Amount AmountHUF { get; }
 
-        public IOption<decimal> TaxRatePercentage { get; }
+        public TaxRate TaxRate { get; }
+        //public IOption<decimal> TaxRatePercentage { get; }
     }
 }

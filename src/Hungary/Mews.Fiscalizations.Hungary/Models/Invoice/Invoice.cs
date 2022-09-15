@@ -18,7 +18,9 @@ namespace Mews.Fiscalizations.Hungary.Models
             ISequence<InvoiceItem> items,
             bool isSelfBilling = false,
             bool isCashAccounting = false,
-            PaymentMethod? paymentMethod = null)
+            PaymentMethod? paymentMethod = null,
+            InvoiceCategory invoiceCategory = Models.InvoiceCategory.NORMAL,
+            InvoiceAppearance invoiceAppearance = Models.InvoiceAppearance.Electric)
         {
             Number = number;
             IssueDate = issueDate;
@@ -33,6 +35,8 @@ namespace Mews.Fiscalizations.Hungary.Models
             IsSelfBilling = isSelfBilling;
             IsCashAccounting = isCashAccounting;
             PaymentMethod = paymentMethod.ToOption();
+            InvoiceCategory = invoiceCategory.ToOption();
+            InvoiceAppearance = invoiceAppearance.ToOption();
 
             CheckConsistency(this);
         }
@@ -62,6 +66,9 @@ namespace Mews.Fiscalizations.Hungary.Models
         public bool IsSelfBilling { get; }
 
         public bool IsCashAccounting { get; }
+        public IOption<InvoiceCategory> InvoiceCategory { get; }
+        public IOption<InvoiceAppearance> InvoiceAppearance { get; }
+        
 
         private ITry<ExchangeRate, Error> GetExchangeRate(ISequence<InvoiceItem> items)
         {
@@ -75,11 +82,11 @@ namespace Mews.Fiscalizations.Hungary.Models
 
         private List<TaxSummaryItem> GetTaxSummary(ISequence<InvoiceItem> indexedItems)
         {
-            var itemsByTaxRate = indexedItems.Values.GroupBy(i => i.Value.TotalAmounts.TaxRatePercentage);
+            var itemsByTaxRate = indexedItems.Values.GroupBy(i => new { i.Value.TotalAmounts.TaxRate.TaxRateType, i.Value.TotalAmounts.TaxRate.TaxRatePercentage });
             var taxSummaryItems = itemsByTaxRate.Select(g => new TaxSummaryItem(
                 amount: Amount.Sum(g.Select(i => i.Value.TotalAmounts.Amount)),
                 amountHUF: Amount.Sum(g.Select(i => i.Value.TotalAmounts.AmountHUF)),
-                taxRatePercentage: g.Key.ToNullable()
+                taxRate: g.First().Value.TotalAmounts.TaxRate
             ));
             return taxSummaryItems.AsList();
         }

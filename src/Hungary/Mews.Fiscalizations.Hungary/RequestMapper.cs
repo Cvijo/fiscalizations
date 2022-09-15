@@ -65,8 +65,8 @@ namespace Mews.Fiscalizations.Hungary
                     {
                         exchangeRate = invoice.ExchangeRate.Value,
                         currencyCode = invoice.CurrencyCode.Value,
-                        invoiceAppearance = Dto.InvoiceAppearanceType.ELECTRONIC,
-                        invoiceCategory = Dto.InvoiceCategoryType.AGGREGATE,
+                        invoiceAppearance = invoice.InvoiceAppearance.Map(m => MapInvoiceAppearance(m)).GetOrElse(Dto.InvoiceAppearanceType.ELECTRONIC),
+                        invoiceCategory = invoice.InvoiceCategory.Map(m => MapInvoiceCategory(m)).GetOrElse(Dto.InvoiceCategoryType.NORMAL),
                         invoiceDeliveryDate = invoice.DeliveryDate,
                         paymentDate = invoice.PaymentDate,
                         paymentDateSpecified = true,
@@ -138,6 +138,25 @@ namespace Mews.Fiscalizations.Hungary
             );
         }
 
+        private static Dto.InvoiceCategoryType MapInvoiceCategory(InvoiceCategory invoiceCategory)
+        {
+            return invoiceCategory.Match(
+                InvoiceCategory.NORMAL, _ => Dto.InvoiceCategoryType.NORMAL,
+                InvoiceCategory.AGGREGATE, _ => Dto.InvoiceCategoryType.AGGREGATE,
+                InvoiceCategory.SIMPLIFIED, _ => Dto.InvoiceCategoryType.SIMPLIFIED
+            );
+        }
+
+        private static Dto.InvoiceAppearanceType MapInvoiceAppearance(InvoiceAppearance invoiceAppearance)
+        {
+            return invoiceAppearance.Match(
+                InvoiceAppearance.Electric, _ => Dto.InvoiceAppearanceType.ELECTRONIC,
+                InvoiceAppearance.EDI, _ => Dto.InvoiceAppearanceType.EDI,
+                InvoiceAppearance.Paper, _ => Dto.InvoiceAppearanceType.PAPER,
+                InvoiceAppearance.Unknown, _ => Dto.InvoiceAppearanceType.UNKNOWN
+            );
+        }
+
         private static Dto.CustomerVatDataType GetCustomerVatDataType(TaxpayerIdentificationNumber taxpayerNumber)
         {
             return taxpayerNumber.Match(
@@ -180,7 +199,7 @@ namespace Mews.Fiscalizations.Hungary
         {
             return new Dto.SummaryByVatRateType
             {
-                vatRate = GetVatRate(taxSummary.TaxRatePercentage),
+                vatRate = GetVatRate(taxSummary.TaxRate),
                 vatRateNetData = new Dto.VatRateNetDataType
                 {
                     vatRateNetAmount = taxSummary.Amount.Net.Value,
@@ -229,7 +248,7 @@ namespace Mews.Fiscalizations.Hungary
                     lineNetAmount = item.TotalAmounts.Amount.Net.Value,
                     lineNetAmountHUF = item.TotalAmounts.AmountHUF.Net.Value
                 },
-                lineVatRate = GetVatRate(item.TotalAmounts.TaxRatePercentage),
+                lineVatRate = GetVatRate(item.TotalAmounts.TaxRate),
                 lineVatData = new Dto.LineVatDataType
                 {
                     lineVatAmount = item.TotalAmounts.Amount.Tax.Value,
@@ -273,15 +292,30 @@ namespace Mews.Fiscalizations.Hungary
             };
         }
 
-        private static Dto.VatRateType GetVatRate(IOption<decimal> taxRatePercentage)
+        private static Dto.VatRateType GetVatRate(TaxRate taxRate)
         {
-            return taxRatePercentage.Match(
-                p => new Dto.VatRateType
-                {
-                    Item = p,
+            return taxRate.TaxRateType.Match(
+                TaxRateTypes.VatPercentage, _ => new Dto.VatRateType
+                {                    
+                    Item = taxRate.TaxRatePercentage.GetOrZero(),
                     ItemElementName = Dto.ItemChoiceType2.vatPercentage
                 },
-                _ => new Dto.VatRateType
+                TaxRateTypes.VatExemption, _ => new Dto.VatRateType
+                {
+                    Item = new Dto.DetailedReasonType { @case = taxRate.Case, reason = taxRate.Reason },
+                    ItemElementName = Dto.ItemChoiceType2.vatExemption
+                },
+                TaxRateTypes.VatOutOfScope, _ => new Dto.VatRateType
+                {
+                    Item = new Dto.DetailedReasonType { @case = taxRate.Case, reason = taxRate.Reason },
+                    ItemElementName = Dto.ItemChoiceType2.vatOutOfScope
+                },
+                TaxRateTypes.VatDomesticReverseCharge, _ => new Dto.VatRateType
+                {
+                    Item = true,
+                    ItemElementName = Dto.ItemChoiceType2.vatDomesticReverseCharge
+                },
+                TaxRateTypes.NoVatCharge, _ => new Dto.VatRateType
                 {
                     Item = true,
                     ItemElementName = Dto.ItemChoiceType2.noVatCharge
