@@ -1,5 +1,6 @@
 ﻿using FuncSharp;
 using Mews.Fiscalizations.Basque.Model;
+using Mews.Fiscalizations.Core.Model;
 using System;
 using System.Globalization;
 using System.Linq;
@@ -8,7 +9,12 @@ namespace Mews.Fiscalizations.Basque
 {
     internal static class DtoToModelConverter
     {
-        public static SendInvoiceResponse Convert(Dto.TicketBaiResponse response, string qrCodeUri, string xmlRequestContent, string xmlResponseContent)
+        public static SendInvoiceResponse Convert(
+            Dto.TicketBaiResponse response,
+            string qrCodeUri,
+            string xmlRequestContent,
+            string xmlResponseContent,
+            String1To100 signatureValue)
         {
             var result = response.Salida;
             return new SendInvoiceResponse(
@@ -17,9 +23,10 @@ namespace Mews.Fiscalizations.Basque
                 qrCodeUri: qrCodeUri,
                 tbaiIdentifier: result.IdentificadorTBAI,
                 received: DateTime.ParseExact(result.FechaRecepcion, "dd-MM-yyyy H:mm:ss", CultureInfo.InvariantCulture),
-                state: result.Estado,
+                state: ParseEnum<InvoiceState>(result.Estado),
                 description: result.Descripcion,
                 stateExplanation: result.Azalpena,
+                signatureValue: signatureValue,
                 csv: result.CSV,
                 validationResults: result.ResultadosValidacion?.Select(v => Convert(v))
             );
@@ -27,7 +34,16 @@ namespace Mews.Fiscalizations.Basque
 
         private static SendInvoiceValidationResult Convert(Dto.ResultadosValidacion validation)
         {
-            return new SendInvoiceValidationResult(validation.Codigo, validation.Descripcion, validation.Azalpena);
+            return new SendInvoiceValidationResult(ParseEnum<ErrorCode>(validation.Codigo), validation.Descripcion, validation.Azalpena);
+        }
+
+        private static T ParseEnum<T>(string value)
+            where T : struct
+        {
+            return Enum.TryParse<T>(value, out var result).Match(
+                u => result,
+                _ => throw new NotImplementedException($"{value} is not implemented in {typeof(T).Name}.")
+            );
         }
     }
 }

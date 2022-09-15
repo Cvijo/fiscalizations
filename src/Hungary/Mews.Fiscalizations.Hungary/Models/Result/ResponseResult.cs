@@ -5,13 +5,14 @@
         where TCode : struct
     {
         public ResponseResult(
+            string requestXml,
+            string responseXml,
             TResult successResult = null,
             ErrorResult<ResultErrorCode> generalErrorMessage = null,
-            ErrorResult<TCode> operationErrorResult = null,
-            string xmlRequestBody = null,
-            string xmlResponseBody = null
-        )
+            ErrorResult<TCode> operationErrorResult = null)
         {
+            RequestXml = requestXml;
+            ResponseXml = responseXml;
             SuccessResult = successResult;
             GeneralErrorResult = generalErrorMessage;
             OperationalErrorResult = operationErrorResult;
@@ -19,9 +20,11 @@
             XmlResponseBody = xmlResponseBody;
         }
 
+        public string RequestXml { get; }
+
+        public string ResponseXml { get; }
+
         public TResult SuccessResult { get; }
-        public string XmlRequestBody { get; set; }
-        public string XmlResponseBody { get; set; }
 
         public ErrorResult<ResultErrorCode> GeneralErrorResult { get; }
 
