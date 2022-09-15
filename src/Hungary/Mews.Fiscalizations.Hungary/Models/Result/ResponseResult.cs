@@ -16,8 +16,6 @@
             SuccessResult = successResult;
             GeneralErrorResult = generalErrorMessage;
             OperationalErrorResult = operationErrorResult;
-            XmlRequestBody = xmlRequestBody;
-            XmlResponseBody = xmlResponseBody;
         }
 
         public string RequestXml { get; }

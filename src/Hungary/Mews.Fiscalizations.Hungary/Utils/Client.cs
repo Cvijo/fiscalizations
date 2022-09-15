@@ -51,7 +51,6 @@ namespace Mews.Fiscalizations.Hungary.Utils
             where TCode : struct
         {
             var content = await response.Content.ReadAsStringAsync();
-            XmlResponseBody = content;
             
             if (response.IsSuccessStatusCode)
             {
