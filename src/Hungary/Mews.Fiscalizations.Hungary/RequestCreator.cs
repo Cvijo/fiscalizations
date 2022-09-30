@@ -34,6 +34,18 @@ namespace Mews.Fiscalizations.Hungary
             return request;
         }
 
+        internal static Dto.QueryInvoiceDataRequest CreateQueryInvoiceDataRequest(TechnicalUser user, SoftwareIdentification software, string invoiceNumber)
+        {
+            var request = CreateRequest<Dto.QueryInvoiceDataRequest>(user, software);
+            request.invoiceNumberQuery = new Dto.InvoiceNumberQueryType {
+                batchIndexSpecified = false,
+                invoiceDirection = Dto.InvoiceDirectionType.OUTBOUND,
+                invoiceNumber = invoiceNumber
+            };
+            return request;
+        }
+
+
         internal static Dto.ManageInvoiceRequest CreateManageInvoicesRequest(TechnicalUser user, SoftwareIdentification software, ExchangeToken token, ISequence<Invoice> invoices)
         {
             return CreateManageInvoicesRequest(user, software, token, Dto.ManageInvoiceOperationType.CREATE, invoices, i => RequestMapper.MapInvoice(i));

@@ -36,8 +36,10 @@ namespace Mews.Fiscalizations.Hungary.Models
             bool isSelfBilling = false,
             bool isCashAccounting = false,
             bool modifyWithoutMaster = false,
-            PaymentMethod? paymentMethod = null)
-            : base(number, issueDate, paymentDate, supplierInfo, receiver, currencyCode, items, isSelfBilling, isCashAccounting, paymentMethod)
+            PaymentMethod? paymentMethod = null,
+            InvoiceCategory invoiceCategory = Models.InvoiceCategory.NORMAL,
+            InvoiceAppearance invoiceAppearance = Models.InvoiceAppearance.Electric)
+            : base(number, issueDate, paymentDate, supplierInfo, receiver, currencyCode, items, isSelfBilling, isCashAccounting, paymentMethod, invoiceCategory, invoiceAppearance)
         {
             OriginalDocumentNumber = originalDocumentNumber;
             ModificationIndex = modificationIndex;

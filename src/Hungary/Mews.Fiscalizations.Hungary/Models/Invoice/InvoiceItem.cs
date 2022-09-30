@@ -14,7 +14,9 @@ namespace Mews.Fiscalizations.Hungary.Models
             Description description,
             int quantity,
             ExchangeRate exchangeRate = null,
-            bool isDeposit = false)
+            bool isDeposit = false,
+            ItemDiscount itemDiscount = null,
+            AdvanceData advanceData = null)
         {
             ConsumptionDate = consumptionDate;
             TotalAmounts = Check.IsNotNull(totalAmounts, nameof(totalAmounts));
@@ -24,6 +26,8 @@ namespace Mews.Fiscalizations.Hungary.Models
             Quantity = quantity;
             ExchangeRate = exchangeRate.ToOption();
             IsDeposit = isDeposit;
+            ItemDiscount = itemDiscount;
+            AdvanceData = advanceData;
         }
 
         public DateTime ConsumptionDate { get; }
@@ -41,5 +45,7 @@ namespace Mews.Fiscalizations.Hungary.Models
         public IOption<ExchangeRate> ExchangeRate { get; }
 
         public bool IsDeposit { get; }
+        public ItemDiscount ItemDiscount { get; }
+        public AdvanceData AdvanceData { get; }
     }
 }

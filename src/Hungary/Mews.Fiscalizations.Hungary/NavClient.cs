@@ -55,6 +55,22 @@ namespace Mews.Fiscalizations.Hungary
             );
         }
 
+        
+        public Task<ResponseResult<InvoiceData, ResultErrorCode>> GetInvoiceDataAsync(string invoiceNumber)
+        {
+            if (string.IsNullOrEmpty(invoiceNumber))
+            {
+                throw new ArgumentException($"{nameof(invoiceNumber)} must be specified.");
+            }
+
+            var request = RequestCreator.CreateQueryInvoiceDataRequest(TechnicalUser, SoftwareIdentification, invoiceNumber);
+            return Client.ProcessRequestAsync<Dto.QueryInvoiceDataRequest, Dto.QueryInvoiceDataResponse, InvoiceData, ResultErrorCode>(
+                endpoint: "queryInvoiceData",
+                request: request,
+                successFunc: (responseDto, requestXml, responseXml) => ModelMapper.MapInvoiceDataResponse(requestXml, responseXml, responseDto)
+            );
+        }
+
         public Task<ResponseResult<TaxPayerData, TaxPayerErrorCode>> GetTaxPayerDataAsync(TaxpayerIdentificationNumber taxId)
         {
             var request = RequestCreator.CreateQueryTaxpayerRequest(TechnicalUser, SoftwareIdentification, taxId.TaxpayerNumber);

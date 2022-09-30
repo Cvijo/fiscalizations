@@ -6,7 +6,7 @@ namespace Mews.Fiscalizations.Hungary.Models
 
     public sealed class ItemAmounts
     {
-        public ItemAmounts(Amount amount, Amount amountHUF, decimal taxRatePercentage )
+        public ItemAmounts(Amount amount, Amount amountHUF, decimal taxRatePercentage)
         {
             Amount = Check.IsNotNull(amount, nameof(amount));
             AmountHUF = Check.IsNotNull(amountHUF, nameof(amountHUF));

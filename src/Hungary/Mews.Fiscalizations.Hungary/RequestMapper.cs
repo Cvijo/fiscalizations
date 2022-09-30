@@ -10,7 +10,7 @@ namespace Mews.Fiscalizations.Hungary
     {
         internal static Dto.InvoiceData MapModificationInvoice(ModificationInvoice invoice)
         {
-            var lines = MapItems(invoice.Items, invoice.ItemIndexOffset);
+            var lines = MapItems(invoice, invoice.ItemIndexOffset);
             var invoiceReference = new Dto.InvoiceReferenceType
             {
                 modificationIndex = invoice.ModificationIndex,
@@ -24,7 +24,7 @@ namespace Mews.Fiscalizations.Hungary
 
         internal static Dto.InvoiceData MapInvoice(Invoice invoice)
         {
-            var lines = MapItems(invoice.Items);
+            var lines = MapItems(invoice);
             var invoiceDto = GetCommonInvoice(invoice, lines);
             return GetCommonInvoiceData(invoice, invoiceDto);
         }
@@ -257,9 +257,42 @@ namespace Mews.Fiscalizations.Hungary
             };
         }
 
-        private static IEnumerable<Dto.LineType> MapItems(ISequence<InvoiceItem> items, int? modificationIndexOffset = null)
+        private static Dto.DiscountDataType MapItemDiscount(InvoiceItem item)
         {
-            return items.Values.Select(i => new Dto.LineType
+            if (item.ItemDiscount == null)
+                return null;
+
+            return new Dto.DiscountDataType
+            {
+                discountDescription = item.ItemDiscount.DiscountDescription,
+                discountValue = item.ItemDiscount.DiscountNetTotal.GetOrZero(),
+                discountValueSpecified = (item.ItemDiscount.DiscountNetTotal.GetOrZero() != 0),
+                discountRate = item.ItemDiscount.DiscountPercentage.GetOrZero(),
+                discountRateSpecified = (item.ItemDiscount.DiscountPercentage.GetOrZero() != 0),
+            };
+        }
+
+        private static Dto.AdvanceDataType MapAdvanceData(InvoiceItem item)
+        {
+            if (item.AdvanceData == null)
+                return null;
+
+            return new Dto.AdvanceDataType
+            {
+                advanceIndicator = item.AdvanceData.AdvanceIndicator,
+                advancePaymentData = item.AdvanceData.AdvanceOriginalInvoice.IsNull() ? null : new Dto.AdvancePaymentDataType
+                {
+                    advancePaymentDate = item.AdvanceData.AdvancePaymentDate,
+                    advanceExchangeRate = item.AdvanceData.AdvanceExchangeRate.Value,
+                    advanceOriginalInvoice = item.AdvanceData.AdvanceOriginalInvoice.Value
+                }
+            };
+        }
+
+        private static IEnumerable<Dto.LineType> MapItems(Invoice invoice, int? modificationIndexOffset = null)
+        {
+            ISequence<InvoiceItem> items = invoice.Items;
+            var lines = items.Values.Select(i => new Dto.LineType
             {
                 lineNumber = i.Index.ToString(),
                 lineDescription = i.Value.Description.Value,
@@ -273,14 +306,18 @@ namespace Mews.Fiscalizations.Hungary
                 unitPriceHUFSpecified = true,
                 depositIndicator = i.Value.IsDeposit,
                 Item = MapLineAmounts(i.Value),
-                aggregateInvoiceLineData = new Dto.AggregateInvoiceLineDataType
+                lineDiscountData = MapItemDiscount(i.Value),  
+                advanceData = MapAdvanceData(i.Value),
+                aggregateInvoiceLineData = (invoice.InvoiceCategory.Get() != InvoiceCategory.AGGREGATE ? null : new Dto.AggregateInvoiceLineDataType
                 {
                     lineExchangeRateSpecified = true,
                     lineExchangeRate = i.Value.ExchangeRate.Map(r => r.Value).GetOrElse(0m),
                     lineDeliveryDate = i.Value.ConsumptionDate
-                },
+                }),
                 lineModificationReference = modificationIndexOffset.HasValue ? GetLineModificationReference(i, modificationIndexOffset.Value) : null
             });
+            
+            return lines;
         }
 
         private static Dto.LineModificationReferenceType GetLineModificationReference(Indexed<InvoiceItem> item, int modificationIndexOffset)
@@ -297,7 +334,7 @@ namespace Mews.Fiscalizations.Hungary
             return taxRate.TaxRateType.Match(
                 TaxRateTypes.VatPercentage, _ => new Dto.VatRateType
                 {                    
-                    Item = taxRate.TaxRatePercentage.GetOrZero(),
+                    Item = taxRate.TaxRatePercentage.Get(),
                     ItemElementName = Dto.ItemChoiceType2.vatPercentage
                 },
                 TaxRateTypes.VatExemption, _ => new Dto.VatRateType

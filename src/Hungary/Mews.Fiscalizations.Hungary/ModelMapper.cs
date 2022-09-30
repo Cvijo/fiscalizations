@@ -3,6 +3,7 @@ using Mews.Fiscalizations.Hungary.Utils;
 using System.Linq;
 using FuncSharp;
 using Mews.Fiscalizations.Core.Xml;
+using System;
 
 namespace Mews.Fiscalizations.Hungary
 {
@@ -93,6 +94,31 @@ namespace Mews.Fiscalizations.Hungary
             );
         }
 
+        internal static ResponseResult<InvoiceData, ResultErrorCode> MapInvoiceDataResponse(
+            string requestXml,
+            string responseXml,
+            Dto.QueryInvoiceDataResponse response)
+        {
+
+            try
+            {
+                var result = response.invoiceDataResult;
+                var xmlInvoice = ServiceInfo.Encoding.GetString(result.invoiceData);
+                return new ResponseResult<InvoiceData, ResultErrorCode>(
+                    requestXml: requestXml,
+                    responseXml: responseXml,
+                    successResult: new InvoiceData(result.auditData.transactionId, result.auditData.insdate, result.auditData.insCusUser, result.auditData.source.ToString(), xmlInvoice)
+                );
+            }
+            catch 
+            {
+                return new ResponseResult<InvoiceData, ResultErrorCode>(
+                    requestXml: requestXml,
+                    responseXml: responseXml,
+                    operationErrorResult: new ErrorResult<ResultErrorCode>(errorCode: ResultErrorCode.InvalidRequest)
+                );
+            }
+        }
         internal static ResponseResult<string, ResultErrorCode> MapManageInvoice(
             string requestXml,
             string responseXml,
