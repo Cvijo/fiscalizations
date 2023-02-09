@@ -1,4 +1,4 @@
-name: Build and test - All
+name: build-and-test-all
 
 on:
   push:
@@ -27,8 +27,13 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
     
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v2
+    - name: Setup .NET 6
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 6.0.x
+        
+    - name: Setup .NET Core 3
+      uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 3.1.x
 
@@ -52,6 +57,9 @@ jobs:
         spanish_issuer_tax_number: ${{secrets.spanish_issuer_tax_number}}
         spanish_receiver_tax_number: ${{secrets.spanish_receiver_tax_number}}
 
+        basque_araba_license: ${{secrets.basque_araba_license}}
+        basque_gipuzkoa_license: ${{secrets.basque_gipuzkoa_license}}
+
         hungarian_login: ${{secrets.hungarian_login}}
         hungarian_password: ${{secrets.hungarian_password}}
         hungarian_signing_key: ${{secrets.hungarian_signing_key}}
@@ -63,4 +71,13 @@ jobs:
 
         austrian_user_id: ${{secrets.austrian_user_id}}
         austrian_password: ${{secrets.austrian_password}}
-      run: dotnet test --no-restore --verbosity normal
+      run: dotnet test --no-restore --logger "trx;LogFileName=test-results-${{ runner.os }}.trx" || true
+
+    - name: Test Report
+      uses: dorny/test-reporter@v1
+      if: success() || failure()
+      with:
+        name: Mews.Fiscalizations.All-${{ runner.os }} Tests
+        path: "**/test-results-${{ runner.os }}.trx"
+        reporter: dotnet-trx
+        fail-on-error: true

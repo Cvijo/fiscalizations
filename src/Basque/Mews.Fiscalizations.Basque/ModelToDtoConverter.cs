@@ -9,13 +9,13 @@ namespace Mews.Fiscalizations.Basque
 {
     internal static class ModelToDtoConverter
     {
-        public static Dto.TicketBai Convert(SendInvoiceRequest sendInvoiceRequest)
+        public static Dto.TicketBai Convert(SendInvoiceRequest sendInvoiceRequest, ServiceInfo serviceInfo)
         {
             return new Dto.TicketBai
             {
                 Cabecera = new Cabecera1
                 {
-                    IDVersionTBAI = ServiceInfo.Version
+                    IDVersionTBAI = serviceInfo.Version
                 },
                 Sujetos = Convert(sendInvoiceRequest.Subject),
                 Factura = Convert(sendInvoiceRequest.Invoice),
@@ -144,12 +144,24 @@ namespace Mews.Fiscalizations.Basque
 
         private static CountryType2 ConvertCountryType2(Country country)
         {
+            // TicketBai country list Dto doesn't recognize Kosovo country code, so its being reported as Serbia.
+            if (country.Equals(Countries.Kosovo))
+            {
+                return CountryType2.RS;
+            }
+
             var result = country.Alpha2Code.ToEnum<CountryType2>();
             return result.Get();
         }
 
         private static CountryType21 CovertCountryType21(Country country)
         {
+            // TicketBai country list Dto doesn't recognize Kosovo country code, so its being reported as Serbia.
+            if (country.Equals(Countries.Kosovo))
+            {
+                return CountryType21.RS;
+            }
+
             var result = country.Alpha2Code.ToEnum<CountryType21>();
             return result.Get();
         }

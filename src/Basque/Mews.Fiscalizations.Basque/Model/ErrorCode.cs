@@ -29,6 +29,9 @@
         // The signature must be valid or the signing certificate must not be expired (more than one month).
         InvalidSignatureOrSigningCertificate = 08,
 
+        // Invalid or missing chain.
+        InvalidOrMissingInvoiceChain = 09,
+
         // The rectified (Corrected) invoice is not indicated.
         CorrectedInvoiceNotIndicated = 011,
 
@@ -62,10 +65,7 @@
         // Breakdown Type of Operation needs at least Provision of Services or Delivery or both.
         BreakdownMustHaveProvisionOrDeliveryOrBoth = 1148,
 
-        // At least one recipient must be informed when the Simplified Invoice field is ·N· or is not
-        // informed or when the Simplified Substitution Issued Invoice field is ·S· or when the Code of Corrective Invoice is not ·R5·
-
-        // TODO: complete the list.
-
+        // The recipient's NIF has the wrong format.
+        InvalidReceiverTaxIdentifierFormat = 1153
     }
 }
