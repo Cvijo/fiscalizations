@@ -6,14 +6,15 @@ namespace Mews.Fiscalizations.Hungary.Models
 {
     public sealed class InvoiceStatus
     {
-        public InvoiceStatus(InvoiceState status, IEnumerable<InvoiceValidationResult> validationResults)
+        public InvoiceStatus(InvoiceState status, IEnumerable<InvoiceValidationResult> validationResults, string xmlInvoice = null)
         {
             Status = status;
             ValidationResults = validationResults;
+            XmlInvoice = xmlInvoice;
         }
 
         public InvoiceState Status { get; }
-
+        public string XmlInvoice { get; }
         public IEnumerable<InvoiceValidationResult> ValidationResults { get; }
 
         internal static Indexed<InvoiceStatus> Map(Dto.ProcessingResultType result)
@@ -22,7 +23,8 @@ namespace Mews.Fiscalizations.Hungary.Models
                 index: result.index,
                 value: new InvoiceStatus(
                     status: (InvoiceState)result.invoiceStatus,
-                    validationResults: InvoiceValidationResult.Map(result.businessValidationMessages, result.technicalValidationMessages)
+                    validationResults: InvoiceValidationResult.Map(result.businessValidationMessages, result.technicalValidationMessages),
+                    result.originalRequest.IsNotNull() ? ServiceInfo.Encoding.GetString(result.originalRequest) : null
                 )
             );
         }

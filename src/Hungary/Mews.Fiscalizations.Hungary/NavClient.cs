@@ -40,14 +40,14 @@ namespace Mews.Fiscalizations.Hungary
             );
         }
 
-        public Task<ResponseResult<TransactionStatus, TransactionErrorCode>> GetTransactionStatusAsync(string transactionId)
+        public Task<ResponseResult<TransactionStatus, TransactionErrorCode>> GetTransactionStatusAsync(string transactionId, bool returnOriginalXml = false)
         {
             if (string.IsNullOrEmpty(transactionId))
             {
                 throw new ArgumentException($"{nameof(transactionId)} must be specified.");
             }
 
-            var request = RequestCreator.CreateQueryTransactionStatusRequest(TechnicalUser, SoftwareIdentification, transactionId);
+            var request = RequestCreator.CreateQueryTransactionStatusRequest(TechnicalUser, SoftwareIdentification, transactionId, returnOriginalXml);
             return Client.ProcessRequestAsync<Dto.QueryTransactionStatusRequest, Dto.QueryTransactionStatusResponse, TransactionStatus, TransactionErrorCode>(
                 endpoint: "queryTransactionStatus",
                 request: request,

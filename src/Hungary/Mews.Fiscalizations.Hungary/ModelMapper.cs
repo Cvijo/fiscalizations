@@ -87,6 +87,7 @@ namespace Mews.Fiscalizations.Hungary
                 );
             }
 
+
             return new ResponseResult<TransactionStatus, TransactionErrorCode>(
                 requestXml: requestXml,
                 responseXml: responseXml,

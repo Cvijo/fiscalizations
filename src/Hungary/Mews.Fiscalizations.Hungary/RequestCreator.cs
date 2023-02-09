@@ -27,10 +27,12 @@ namespace Mews.Fiscalizations.Hungary
             return request;
         }
 
-        internal static Dto.QueryTransactionStatusRequest CreateQueryTransactionStatusRequest(TechnicalUser user, SoftwareIdentification software, string invoiceId)
+        internal static Dto.QueryTransactionStatusRequest CreateQueryTransactionStatusRequest(TechnicalUser user, SoftwareIdentification software, string invoiceId, bool returnOriginalXml)
         {
             var request = CreateRequest<Dto.QueryTransactionStatusRequest>(user, software);
             request.transactionId = invoiceId;
+            request.returnOriginalRequest = returnOriginalXml;
+            request.returnOriginalRequestSpecified = returnOriginalXml;
             return request;
         }
 
