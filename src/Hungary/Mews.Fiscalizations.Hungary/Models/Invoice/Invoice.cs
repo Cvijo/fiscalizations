@@ -18,6 +18,7 @@ namespace Mews.Fiscalizations.Hungary.Models
             ISequence<InvoiceItem> items,
             bool isSelfBilling = false,
             bool isCashAccounting = false,
+            DateTime? deliveryDate = null,
             PaymentMethod? paymentMethod = null,
             InvoiceCategory invoiceCategory = Models.InvoiceCategory.NORMAL,
             InvoiceAppearance invoiceAppearance = Models.InvoiceAppearance.Electric)
@@ -29,7 +30,7 @@ namespace Mews.Fiscalizations.Hungary.Models
             Receiver = receiver;
             CurrencyCode = currencyCode;
             Items = items;
-            DeliveryDate = Items.Values.Max(i => i.Value.ConsumptionDate);
+            DeliveryDate = deliveryDate ?? Items.Values.Max(i => i.Value.ConsumptionDate);
             ExchangeRate = GetExchangeRate(items).Success.Get();
             TaxSummary = GetTaxSummary(items);
             IsSelfBilling = isSelfBilling;
