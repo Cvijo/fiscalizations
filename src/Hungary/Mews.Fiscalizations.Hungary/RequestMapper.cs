@@ -1,5 +1,6 @@
 ﻿using FuncSharp;
 using Mews.Fiscalizations.Core.Model;
+using Mews.Fiscalizations.Hungary.Dto;
 using Mews.Fiscalizations.Hungary.Models;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,13 +32,14 @@ namespace Mews.Fiscalizations.Hungary
 
         private static Dto.InvoiceData GetCommonInvoiceData(Invoice invoice, Dto.InvoiceType invoiceDto)
         {
+
             return new Dto.InvoiceData
             {
                 invoiceIssueDate = invoice.IssueDate,
                 invoiceNumber = invoice.Number.Value,
                 completenessIndicator = invoice.Receiver.Match(
                     customer => false,
-                    company => true
+                    company => (invoice.InvoiceAppearance.Get() != InvoiceAppearance.Paper) //is it is paper apperiance must be false even if company is Reciver
                 ),
                 invoiceMain = new Dto.InvoiceMainType
                 {
@@ -306,7 +308,7 @@ namespace Mews.Fiscalizations.Hungary
                 unitPriceHUFSpecified = true,
                 depositIndicator = i.Value.IsDeposit,
                 Item = MapLineAmounts(i.Value),
-                lineDiscountData = MapItemDiscount(i.Value),  
+                lineDiscountData = MapItemDiscount(i.Value),
                 advanceData = MapAdvanceData(i.Value),
                 aggregateInvoiceLineData = (invoice.InvoiceCategory.Get() != InvoiceCategory.AGGREGATE ? null : new Dto.AggregateInvoiceLineDataType
                 {
@@ -316,7 +318,7 @@ namespace Mews.Fiscalizations.Hungary
                 }),
                 lineModificationReference = modificationIndexOffset.HasValue ? GetLineModificationReference(i, modificationIndexOffset.Value) : null
             });
-            
+
             return lines;
         }
 
@@ -333,7 +335,7 @@ namespace Mews.Fiscalizations.Hungary
         {
             return taxRate.TaxRateType.Match(
                 TaxRateTypes.VatPercentage, _ => new Dto.VatRateType
-                {                    
+                {
                     Item = taxRate.TaxRatePercentage.Get(),
                     ItemElementName = Dto.ItemChoiceType2.vatPercentage
                 },
