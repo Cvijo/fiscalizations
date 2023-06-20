@@ -68,7 +68,7 @@ namespace Mews.Fiscalizations.Core.Model
                 Croatia = NonEuropean("HR"),
                 Cuba = NonEuropean("CU"),
                 Curacao = NonEuropean("CW"),
-                Cyprus = European("CY", taxpayerNumberPattern: "^(CY)?[0-9]{8}L$", taxpayerNumberPatternWithoutCountryCodePrefix: "^[0-9]{8}L$"),
+                Cyprus = European("CY", taxpayerNumberPattern: "^(CY)?[0-9]{8}[A-Za-z]$", taxpayerNumberPatternWithoutCountryCodePrefix: "^[0-9]{8}[A-Za-z]$"),
                 CzechRepublic = European("CZ", taxpayerNumberPattern: "^(CZ)?[0-9]{8,10}$", taxpayerNumberPatternWithoutCountryCodePrefix: "^[0-9]{8,10}$"),
                 Denmark = European("DK", taxpayerNumberPattern: "^(DK)?[0-9]{8}$", taxpayerNumberPatternWithoutCountryCodePrefix: "^[0-9]{8}$"),
                 Djibouti = NonEuropean("DJ"),
