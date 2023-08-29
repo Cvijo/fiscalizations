@@ -21,7 +21,8 @@ namespace Mews.Fiscalizations.Hungary.Models
             DateTime? deliveryDate = null,
             PaymentMethod? paymentMethod = null,
             InvoiceCategory invoiceCategory = Models.InvoiceCategory.NORMAL,
-            InvoiceAppearance invoiceAppearance = Models.InvoiceAppearance.Electric)
+            InvoiceAppearance invoiceAppearance = Models.InvoiceAppearance.Electric,
+            List<AdditionalInvoiceData> additionalInvoiceData = null)
         {
             Number = number;
             IssueDate = issueDate;
@@ -38,6 +39,7 @@ namespace Mews.Fiscalizations.Hungary.Models
             PaymentMethod = paymentMethod.ToOption();
             InvoiceCategory = invoiceCategory.ToOption();
             InvoiceAppearance = invoiceAppearance.ToOption();
+            AdditionalInvoiceData = additionalInvoiceData;
 
             CheckConsistency(this);
         }
@@ -61,6 +63,7 @@ namespace Mews.Fiscalizations.Hungary.Models
         public ExchangeRate ExchangeRate { get; }
 
         public List<TaxSummaryItem> TaxSummary { get; }
+        public List<AdditionalInvoiceData> AdditionalInvoiceData { get; }
 
         public ISequence<InvoiceItem> Items { get; }
 

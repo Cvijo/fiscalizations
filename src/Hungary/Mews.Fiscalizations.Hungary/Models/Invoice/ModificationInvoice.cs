@@ -1,5 +1,6 @@
 using Mews.Fiscalizations.Core.Model;
 using System;
+using System.Collections.Generic;
 
 namespace Mews.Fiscalizations.Hungary.Models
 {
@@ -39,8 +40,9 @@ namespace Mews.Fiscalizations.Hungary.Models
             DateTime? deliveryDate = null,
             PaymentMethod? paymentMethod = null,            
             InvoiceCategory invoiceCategory = Models.InvoiceCategory.NORMAL,
-            InvoiceAppearance invoiceAppearance = Models.InvoiceAppearance.Electric)
-            : base(number, issueDate, paymentDate, supplierInfo, receiver, currencyCode, items, isSelfBilling, isCashAccounting, deliveryDate, paymentMethod, invoiceCategory, invoiceAppearance)
+            InvoiceAppearance invoiceAppearance = Models.InvoiceAppearance.Electric,
+            List<AdditionalInvoiceData> additionalInvoiceData = null)
+            : base(number, issueDate, paymentDate, supplierInfo, receiver, currencyCode, items, isSelfBilling, isCashAccounting, deliveryDate, paymentMethod, invoiceCategory, invoiceAppearance, additionalInvoiceData)
         {
             OriginalDocumentNumber = originalDocumentNumber;
             ModificationIndex = modificationIndex;

@@ -75,7 +75,8 @@ namespace Mews.Fiscalizations.Hungary
                         selfBillingIndicator = invoice.IsSelfBilling,
                         cashAccountingIndicator = invoice.IsCashAccounting,
                         paymentMethod = invoice.PaymentMethod.Map(m => MapPaymentMethod(m)).GetOrElse(Dto.PaymentMethodType.OTHER),
-                        paymentMethodSpecified = invoice.PaymentMethod.NonEmpty
+                        paymentMethodSpecified = invoice.PaymentMethod.NonEmpty,
+                        additionalInvoiceData = GetAdditionalInvoiceData(invoice),
                     },
                     supplierInfo = new Dto.SupplierInfoType
                     {
@@ -157,6 +158,16 @@ namespace Mews.Fiscalizations.Hungary
                 InvoiceAppearance.Paper, _ => Dto.InvoiceAppearanceType.PAPER,
                 InvoiceAppearance.Unknown, _ => Dto.InvoiceAppearanceType.UNKNOWN
             );
+        }
+
+        private static Dto.AdditionalDataType[] GetAdditionalInvoiceData(Invoice invoice)
+        {
+
+            if( invoice.AdditionalInvoiceData.Any())
+            {
+                return invoice.AdditionalInvoiceData.Select(x => new Dto.AdditionalDataType { dataDescription = x.DataDescription, dataName = x.DataName, dataValue = x.DataValue }).ToArray();
+            }
+            return null;
         }
 
         private static Dto.CustomerVatDataType GetCustomerVatDataType(TaxpayerIdentificationNumber taxpayerNumber)
