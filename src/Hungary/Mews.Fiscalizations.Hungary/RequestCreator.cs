@@ -101,6 +101,35 @@ namespace Mews.Fiscalizations.Hungary
             return request;
         }
 
+        internal static Dto.ManageAnnulmentRequest CreateInvoiceAnnulmentRequest(
+    TechnicalUser user,
+    SoftwareIdentification software,
+    ExchangeToken token,
+    InvoiceNumber invoiceNumber,
+    AnnulmentCode annulmentCode,
+    string reason)
+        {
+
+            var annulmentData = RequestMapper.MapInvoiceAnnulment(invoiceNumber, annulmentCode, reason);
+            var parameters = new XmlSerializationParameters(namespaces: ServiceInfo.XmlNamespace.ToEnumerable());
+            var serializedAnnulmentData = XmlSerializer.Serialize(annulmentData, parameters);
+            var annulmentDataBytes = ServiceInfo.Encoding.GetBytes(serializedAnnulmentData.OuterXml);
+
+            var annulmentDto = new Dto.AnnulmentOperationType
+            {
+                index = 1,
+                annulmentOperation = Dto.ManageAnnulmentOperationType.ANNUL,
+                invoiceAnnulment = annulmentDataBytes
+            };
+
+            var annulmentSignatureData = Sha512.GetSha3Hash($"{Dto.ManageAnnulmentOperationType.ANNUL}{Convert.ToBase64String(annulmentDataBytes)}");
+
+
+            var request = CreateRequest<Dto.ManageAnnulmentRequest>(user, software, annulmentSignatureData);
+            request.exchangeToken = ServiceInfo.Encoding.GetString(token.Value);
+            request.annulmentOperations = new Dto.AnnulmentOperationType[] { annulmentDto };
+            return request;
+        }
         private static T CreateRequest<T>(TechnicalUser user, SoftwareIdentification software, string additionalSignatureData = null)
             where T : Dto.BasicOnlineInvoiceRequestType, new()
         {

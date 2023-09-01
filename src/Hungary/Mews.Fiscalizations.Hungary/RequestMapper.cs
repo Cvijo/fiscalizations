@@ -2,6 +2,7 @@
 using Mews.Fiscalizations.Core.Model;
 using Mews.Fiscalizations.Hungary.Dto;
 using Mews.Fiscalizations.Hungary.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -47,6 +48,23 @@ namespace Mews.Fiscalizations.Hungary
                 }
             };
         }
+        internal static Dto.InvoiceAnnulment MapInvoiceAnnulment(InvoiceNumber invoiceNumber, AnnulmentCode annulmentCode, string reason)
+        {
+            var nowUtc = DateTime.UtcNow;
+            return new Dto.InvoiceAnnulment
+            {
+                annulmentCode = annulmentCode.Match(
+                                AnnulmentCode.ERRATIC_DATA, _ => Dto.AnnulmentCodeType.ERRATIC_DATA,
+                                AnnulmentCode.ERRATIC_INVOICE_NUMBER, _ => Dto.AnnulmentCodeType.ERRATIC_INVOICE_NUMBER,
+                                AnnulmentCode.ERRATIC_INVOICE_ISSUE_DATE, _ => Dto.AnnulmentCodeType.ERRATIC_INVOICE_ISSUE_DATE,
+                                AnnulmentCode.ERRATIC_ELECTRONIC_HASH_VALUE, _ => Dto.AnnulmentCodeType.ERRATIC_ELECTRONIC_HASH_VALUE
+                                ),
+                annulmentReason = reason,
+                annulmentReference = invoiceNumber.Value,
+                annulmentTimestamp = new DateTime(nowUtc.Year, nowUtc.Month, nowUtc.Day, nowUtc.Hour, nowUtc.Minute, nowUtc.Second, DateTimeKind.Utc)
+            };
+        }
+
 
         private static Dto.InvoiceType GetCommonInvoice(Invoice invoice, IEnumerable<Dto.LineType> lines, Dto.InvoiceReferenceType invoiceReference = null)
         {

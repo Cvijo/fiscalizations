@@ -93,20 +93,23 @@ namespace Mews.Fiscalizations.Hungary
             return ManageInvoicesAsync(request, invoices);
         }
 
-        //public Task<ResponseResult<TransactionStatus, TransactionErrorCode>> SendAnnulmentAsync(string transactionId, bool returnOriginalXml = false)
-        //{
-        //    if (string.IsNullOrEmpty(transactionId))
-        //    {
-        //        throw new ArgumentException($"{nameof(transactionId)} must be specified.");
-        //    }
+        public Task<ResponseResult<string, ResultErrorCode>> SendAnnulmentAsync(ExchangeToken token, InvoiceNumber invoiceNumber, string reason, AnnulmentCode annulmentCode = AnnulmentCode.ERRATIC_DATA)
+        {
 
-        //    var request = RequestCreator.CreateQueryTransactionStatusRequest(TechnicalUser, SoftwareIdentification, transactionId, returnOriginalXml);
-        //    return Client.ProcessRequestAsync<Dto.ManageAnnulmentRequest, Dto.ManageAnnulmentResponse, TransactionStatus, TransactionErrorCode>(
-        //        endpoint: "queryTransactionStatus",
-        //        request: request,
-        //        successFunc: (responseDto, requestXml, responseXml) => ModelMapper.MapTransactionStatus(requestXml, responseXml, responseDto)
-        //    );
-        //}
+            if (string.IsNullOrEmpty(reason))
+            {
+                throw new ArgumentException($"{nameof(reason)} must be specified.");
+            }
+
+            var request = RequestCreator.CreateInvoiceAnnulmentRequest(TechnicalUser, SoftwareIdentification, token, invoiceNumber, annulmentCode, reason);
+
+            return Client.ProcessRequestAsync<Dto.ManageAnnulmentRequest, Dto.ManageAnnulmentResponse, string, ResultErrorCode>(
+                endpoint: "manageAnnulment",
+                request: request,
+                successFunc: (responseDto, requestXml, responseXml) => ModelMapper.MapInvoiceAnnulment(requestXml, responseXml, responseDto)
+            );
+        }
+
         private Task<ResponseResult<string, ResultErrorCode>> ManageInvoicesAsync<TDocument>(Dto.ManageInvoiceRequest request, ISequence<TDocument> invoices)
         {
             if (invoices.Values.Count() > ServiceInfo.MaxInvoiceBatchSize)
