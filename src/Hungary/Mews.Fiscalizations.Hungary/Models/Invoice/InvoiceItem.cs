@@ -1,6 +1,7 @@
 ﻿using FuncSharp;
 using Mews.Fiscalizations.Core.Model;
 using System;
+using System.Collections.Generic;
 
 namespace Mews.Fiscalizations.Hungary.Models
 {
@@ -16,7 +17,8 @@ namespace Mews.Fiscalizations.Hungary.Models
             ExchangeRate exchangeRate = null,
             bool isDeposit = false,
             ItemDiscount itemDiscount = null,
-            AdvanceData advanceData = null)
+            AdvanceData advanceData = null,
+            List<AdditionalLineData> additionalLineData = null)
         {
             ConsumptionDate = consumptionDate;
             TotalAmounts = Check.IsNotNull(totalAmounts, nameof(totalAmounts));
@@ -28,6 +30,7 @@ namespace Mews.Fiscalizations.Hungary.Models
             IsDeposit = isDeposit;
             ItemDiscount = itemDiscount;
             AdvanceData = advanceData;
+            AdditionalLineData = additionalLineData;
         }
 
         public DateTime ConsumptionDate { get; }
@@ -47,5 +50,6 @@ namespace Mews.Fiscalizations.Hungary.Models
         public bool IsDeposit { get; }
         public ItemDiscount ItemDiscount { get; }
         public AdvanceData AdvanceData { get; }
+        public List<AdditionalLineData> AdditionalLineData { get; }
     }
 }

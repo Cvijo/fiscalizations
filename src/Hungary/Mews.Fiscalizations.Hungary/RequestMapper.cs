@@ -327,7 +327,8 @@ namespace Mews.Fiscalizations.Hungary
                     lineExchangeRate = i.Value.ExchangeRate.Map(r => r.Value).GetOrElse(0m),
                     lineDeliveryDate = i.Value.ConsumptionDate
                 }),
-                lineModificationReference = modificationIndexOffset.HasValue ? GetLineModificationReference(i, modificationIndexOffset.Value) : null
+                lineModificationReference = modificationIndexOffset.HasValue ? GetLineModificationReference(i, modificationIndexOffset.Value) : null,
+                additionalLineData = i.Value.AdditionalLineData?.Select(x => new Dto.AdditionalDataType { dataDescription = x.DataDescription, dataName = x.DataName, dataValue = x.DataValue }).ToArray()
             });
 
             return lines;
