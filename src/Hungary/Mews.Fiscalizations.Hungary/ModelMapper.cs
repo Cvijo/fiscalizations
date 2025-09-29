@@ -111,7 +111,7 @@ namespace Mews.Fiscalizations.Hungary
                     successResult: new InvoiceData(result.auditData.transactionId, result.auditData.insdate, result.auditData.insCusUser, result.auditData.source.ToString(), xmlInvoice)
                 );
             }
-            catch 
+            catch
             {
                 return new ResponseResult<InvoiceData, ResultErrorCode>(
                     requestXml: requestXml,
@@ -132,6 +132,17 @@ namespace Mews.Fiscalizations.Hungary
             );
         }
 
+        internal static ResponseResult<string, ResultErrorCode> MapInvoiceAnnulment(
+            string requestXml,
+            string responseXml,
+            Dto.ManageAnnulmentResponse response)
+        {
+            return new ResponseResult<string, ResultErrorCode>(
+                requestXml: requestXml,
+                responseXml: responseXml,
+                successResult: response.transactionId
+            );
+        }
         private static IncorporationType MapIncorporationType(Dto.IncorporationType incorporationType)
         {
             return incorporationType.Match(
